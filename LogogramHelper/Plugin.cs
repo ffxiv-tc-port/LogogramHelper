@@ -117,7 +117,7 @@ namespace LogogramHelper
                 });
 
                 var arrayData = Framework.Instance()->GetUIModule()->GetRaptureAtkModule()->AtkModule.AtkArrayDataHolder;
-                var stringArrayData = arrayData.StringArrays[26];
+                var stringArrayData = arrayData.StringArrays[27];
                 var seStr = GetTooltipString(stringArrayData, 13);
                 if (seStr == null) return;
 
