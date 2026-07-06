@@ -18,7 +18,7 @@ public class MainWindow : Window, IDisposable
     private List<LogosAction> LogosActions { get; }
 
     public MainWindow(Plugin plugin) : base(
-        "Logos Actions", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize)
+        Loc.T("Logos Actions"), ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize)
     {
         this.Plugin = plugin;
         this.LogosActions = plugin.LogosActions;
@@ -36,7 +36,7 @@ public class MainWindow : Window, IDisposable
         var fontScaling = ImGui.GetFontSize() / 17;
 
         ImGui.PushItemWidth(400);
-        ImGui.InputTextWithHint("", "Filter Logos Actions...", ref filter, 50, ImGuiInputTextFlags.AutoSelectAll);
+        ImGui.InputTextWithHint("", Loc.T("Filter Logos Actions..."), ref filter, 50, ImGuiInputTextFlags.AutoSelectAll);
         ImGui.PopItemWidth();
 
         ImGui.SameLine();
@@ -44,7 +44,7 @@ public class MainWindow : Window, IDisposable
         if (ImGuiComponents.IconButton("KoFi", FontAwesomeIcon.Coffee, new Vector4(1.0f, 0.35f, 0.37f, 1.0f)))
             Process.Start(new ProcessStartInfo { FileName = "https://ko-fi.com/apetih", UseShellExecute = true });
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Support me on Ko-Fi");
+            ImGui.SetTooltip(Loc.T("Support me on Ko-Fi"));
 
 
         for (var i = 0; i < 56; i++)
@@ -53,7 +53,8 @@ public class MainWindow : Window, IDisposable
             var padding = 2;
             var bg = new Vector4(0.0f, 0.0f, 0.0f, 1.0f);
             var tint = new Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-            if (!action.Name.ToLower().Contains(filter.ToLower())) tint.W = 0.25f;
+            var actionName = Loc.T(action.Name);
+            if (!action.Name.ToLower().Contains(filter.ToLower()) && !actionName.Contains(filter)) tint.W = 0.25f;
             if (ImGui.ImageButton(Plugin.TextureProvider.GetFromGameIcon(action.IconID).GetWrapOrEmpty().ImGuiHandle, new Vector2(40, 40) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f), padding, bg, tint))
             {
                 /*var roleTextures = new Dictionary<uint, ISharedImmediateTexture>();
@@ -65,7 +66,7 @@ public class MainWindow : Window, IDisposable
                 Plugin.DrawLogosDetailUI(action);
             }
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip($"{action.Name}");
+                ImGui.SetTooltip(actionName);
             if ((i + 1) % 10 != 0) ImGui.SameLine();
         }
 

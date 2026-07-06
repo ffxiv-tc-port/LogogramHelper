@@ -21,7 +21,7 @@ namespace LogogramHelper.Windows
         private ISharedImmediateTexture Texture { get; set; } = null!;
         private IDictionary<uint, ISharedImmediateTexture> RoleTextures { get; set; } = null!;
         public LogosWindow(Plugin plugin) : base(
-        "Logos Details", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize)
+        Loc.T("Logos Details"), ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize)
         {
             this.Plugin = plugin;
             this.Action = plugin.LogosActions[0];
@@ -67,7 +67,7 @@ namespace LogogramHelper.Windows
             ImGui.Image(Texture.GetWrapOrEmpty().ImGuiHandle, new Vector2(40, 40) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
             ImGui.SameLine();
             ImGui.BeginGroup();
-            ImGui.Text(Action.Name);
+            ImGui.Text(Loc.T(Action.Name));
             ImGui.SameLine();
             ImGui.BeginGroup();
             Action.Roles.ForEach(role => {
@@ -76,20 +76,20 @@ namespace LogogramHelper.Windows
                 ImGui.SameLine();
             });
             ImGui.EndGroup();
-            var details = Action.Type.ToUpper();
+            var details = Loc.T(Action.Type);
             if (Action.Duration != null)
-                details += $" · DURATION: {Action.Duration}";
+                details += $" · 持續時間：{Action.Duration}";
             if (Action.Cast != null)
-                details += $" · CAST: {Action.Cast}";
+                details += $" · 詠唱時間：{Action.Cast}";
             if (Action.Recast != null)
-                details += $" · RECAST: {Action.Recast}";
+                details += $" · 重使用時間：{Action.Recast}";
             ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), details);
             ImGui.EndGroup();
             ImGui.EndGroup();
             ImGui.Spacing();
-            ImGui.Text($"{Action.Description}");
+            ImGui.Text(Loc.T(Action.Description));
             ImGui.Spacing();
-            ImGui.Text("Combinations:");
+            ImGui.Text(Loc.T("Combinations:"));
             ImGui.BeginChild($"combinations{Action.Name}", new Vector2(540.0f * fontScaling, (ImGui.GetFontSize() + 4) * Action.Recipes.Count), false, ImGuiWindowFlags.NoScrollbar);
             ImGui.Columns(2, "combinations", false);
             ImGui.SetColumnWidth(0, 40f);
@@ -101,7 +101,7 @@ namespace LogogramHelper.Windows
                     if (!LogogramStock.ContainsKey(item.LogogramID))
                         LogogramStock.Add(item.LogogramID, 0);
                     total.Add(LogogramStock[item.LogogramID] / item.Quantity);
-                    for (var j = 0; j < item.Quantity; j++) logosNames.Add(Logograms[item.LogogramID].Name);
+                    for (var j = 0; j < item.Quantity; j++) logosNames.Add(Loc.T(Logograms[item.LogogramID].Name));
                 });
                 if (total.Min() > 0)
                     ImGui.Text($"{total.Min()}");

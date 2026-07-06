@@ -113,7 +113,7 @@ namespace LogogramHelper
                 var contents = new List<string>();
                 contentsId.ForEach(content =>
                 {
-                    contents.Add(Logograms[content].Name);
+                    contents.Add(Loc.T(Logograms[content].Name));
                 });
 
                 var arrayData = Framework.Instance()->GetUIModule()->GetRaptureAtkModule()->AtkModule.AtkArrayDataHolder;
@@ -121,7 +121,7 @@ namespace LogogramHelper
                 var seStr = GetTooltipString(stringArrayData, 13);
                 if (seStr == null) return;
 
-                var insert = $"\n\nPotential logograms contained: {string.Join(", ", contents.ToArray())}";
+                var insert = $"\n\n{Loc.T("Potential logograms contained:")} {string.Join(", ", contents.ToArray())}";
                 if (!seStr.TextValue.Contains(insert)) seStr.Payloads.Insert(1, new TextPayload(insert));
 
                 stringArrayData->SetValue(13, seStr.Encode(), false, true, true);
