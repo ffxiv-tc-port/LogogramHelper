@@ -38,6 +38,7 @@ namespace LogogramHelper
 
         internal List<LogosAction> LogosActions;
         internal IDictionary<int, Logogram> Logograms;
+        internal IDictionary<int, uint> LogogramIcons;
         internal IDictionary<ulong, LogogramItem> LogogramItems;
         internal IDictionary<int, int> LogogramStock = new Dictionary<int, int>();
 
@@ -96,6 +97,9 @@ namespace LogogramHelper
             LogosActions = JsonConvert.DeserializeObject<List<LogosAction>>(logosJson);
             r.Close();
 
+            LogogramIcons = Logograms.Values.ToDictionary(
+                keySelector: l => l.Id,
+                elementSelector: l => LogosActions.First(a => a.Name == l.Name).IconID);
         }
 
         public void DrawLogosDetailUI(LogosAction action)
