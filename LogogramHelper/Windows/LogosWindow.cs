@@ -52,6 +52,16 @@ namespace LogogramHelper.Windows
             this.Action = action;
             this.Texture = Plugin.TextureProvider.GetFromGameIcon(action.IconID);
         }
+
+        private void FillSynthesizer(List<Recipe> recipe, bool starChart)
+        {
+            if (!SynthesisAutomation.SelectSynthesizer(starChart)) return;
+            recipe.ForEach(item => {
+                if (!Plugin.LogogramRowIndex.TryGetValue(item.LogogramID, out var row)) return;
+                for (var q = 0; q < item.Quantity; q++)
+                    SynthesisAutomation.AddShard(row);
+            });
+        }
         public override void Draw()
         {
             var addonShardListPtr = Plugin.GameGui.GetAddonByName("EurekaMagiciteItemShardList", 1);
@@ -93,10 +103,19 @@ namespace LogogramHelper.Windows
             var iconSize = ImGui.GetFontSize() * 1.4f;
             var rowHeight = iconSize + 6;
             ImGui.BeginChild($"combinations{Action.Name}", new Vector2(540.0f * fontScaling, rowHeight * Action.Recipes.Count), false, ImGuiWindowFlags.NoScrollbar);
-            ImGui.Columns(2, "combinations", false);
-            ImGui.SetColumnWidth(0, 40f);
-            ImGui.SetColumnWidth(1, 500f * fontScaling);
-            Action.Recipes.ForEach(recipe => {
+            ImGui.Columns(3, "combinations", false);
+            ImGui.SetColumnWidth(0, 90f * fontScaling);
+            ImGui.SetColumnWidth(1, 40f);
+            ImGui.SetColumnWidth(2, 410f * fontScaling);
+            for (var recipeIdx = 0; recipeIdx < Action.Recipes.Count; recipeIdx++)
+            {
+                var recipe = Action.Recipes[recipeIdx];
+                if (ImGui.SmallButton($"放入靈極##{recipeIdx}"))
+                    FillSynthesizer(recipe, false);
+                ImGui.SameLine();
+                if (ImGui.SmallButton($"放入星極##{recipeIdx}"))
+                    FillSynthesizer(recipe, true);
+                ImGui.NextColumn();
                 var craftable = new List<int>();
                 recipe.ForEach(item => {
                     if (!LogogramStock.ContainsKey(item.LogogramID))
@@ -126,7 +145,7 @@ namespace LogogramHelper.Windows
                     }
                 }
                 ImGui.NextColumn();
-            });
+            }
             ImGui.EndChild();
             ImGui.PopTextWrapPos();
         }

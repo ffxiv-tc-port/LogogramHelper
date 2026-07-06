@@ -36,11 +36,12 @@ namespace LogogramHelper
         public WindowSystem WindowSystem = new("LogogramHelper");
         public MainWindow MainWindow { get; init; }
         public LogosWindow LogosWindow { get; init; }
-        public DebugHook DebugHook { get; init; }
+        public static DebugHook DebugHook { get; private set; } = null!;
 
         internal List<LogosAction> LogosActions;
         internal IDictionary<int, Logogram> Logograms;
         internal IDictionary<int, uint> LogogramIcons;
+        internal IDictionary<int, int> LogogramRowIndex;
         internal IDictionary<ulong, LogogramItem> LogogramItems;
         internal IDictionary<int, int> LogogramStock = new Dictionary<int, int>();
 
@@ -64,7 +65,7 @@ namespace LogogramHelper
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
-            this.DebugHook.Dispose();
+            DebugHook.Dispose();
         }
 
         private void DrawUI()
@@ -88,6 +89,9 @@ namespace LogogramHelper
             var logogramJson = logogramReader.ReadToEnd();
             var Logos = JsonConvert.DeserializeObject<List<Logogram>>(logogramJson);
             Logograms = Logos.ToDictionary(keySelector: l => l.Id, elementSelector: l => l);
+            // Row index (1-based) within the shard list's default "全部" tab ordering, matching
+            // the order logograms.json entries are listed in.
+            LogogramRowIndex = Logos.Select((l, i) => (l.Id, Row: i + 1)).ToDictionary(x => x.Id, x => x.Row);
             logogramReader.Close();
 
             using var itemReader = new StreamReader(Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "itemContents.json"));

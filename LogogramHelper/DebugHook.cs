@@ -42,6 +42,9 @@ namespace LogogramHelper
             fireCallbackHook.Original(thisPtr, valueCount, values, close);
         }
 
+        public void Invoke(AtkUnitBase* thisPtr, uint valueCount, AtkValue* values, bool close = false) =>
+            fireCallbackHook.Original(thisPtr, valueCount, values, close);
+
         public void Dispose()
         {
             fireCallbackHook.Dispose();
