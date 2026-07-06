@@ -1,9 +1,9 @@
 {
     "Name": "Logogram Helper",
-    "Author": "apetih",
-    "Punchline": "Helper plugin for Eureka's Logos Actions.",
-    "Description": "Shows amounts of possible combinations for Eureka's Logos Actions upon entering the Logos Manipulator.",
-    "RepoUrl": "https://github.com/apetih/LogogramHelper",
+    "Author": "apetih, Lother",
+    "Punchline": "優雷卡聖言技能輔助工具。",
+    "Description": "進入聖言操縱者後，顯示優雷卡聖言技能所有可能組合的數量。",
+    "RepoUrl": "https://github.com/Lother/LogogramHelper",
     "ApplicableVersion": "any",
     "Tags": [
         "eureka",
@@ -12,5 +12,5 @@
     "CategoryTags": [
         "utility"
     ],
-    "IconUrl": "https://raw.githubusercontent.com/apetih/LogogramHelper/master/res/img/logoslogo.png"
+    "IconUrl": "https://raw.githubusercontent.com/Lother/LogogramHelper/tc-7.15/res/img/logoslogo.png"
 }
