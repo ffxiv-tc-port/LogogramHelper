@@ -31,10 +31,12 @@ namespace LogogramHelper
         [PluginService] public static ITextureProvider TextureProvider { get; private set; } = null!;
         [PluginService] public static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
         [PluginService] public static IAddonLifecycle AddonLifecycle { get; private set; } = null!;
+        [PluginService] public static IPluginLog Log { get; private set; } = null!;
 
         public WindowSystem WindowSystem = new("LogogramHelper");
         public MainWindow MainWindow { get; init; }
         public LogosWindow LogosWindow { get; init; }
+        public DebugHook DebugHook { get; init; }
 
         internal List<LogosAction> LogosActions;
         internal IDictionary<int, Logogram> Logograms;
@@ -47,6 +49,7 @@ namespace LogogramHelper
 
             LoadData();
 
+            DebugHook = new DebugHook();
             MainWindow = new MainWindow(this);
             LogosWindow = new LogosWindow(this);
 
@@ -61,6 +64,7 @@ namespace LogogramHelper
         public void Dispose()
         {
             this.WindowSystem.RemoveAllWindows();
+            this.DebugHook.Dispose();
         }
 
         private void DrawUI()
