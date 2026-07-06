@@ -46,10 +46,6 @@ public class MainWindow : Window, IDisposable
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip(Loc.T("Support me on Ko-Fi"));
 
-        var debugMode = Plugin.DebugHook.Enabled;
-        if (ImGui.Checkbox("診斷模式（將點擊事件印到 /xllog）", ref debugMode))
-            Plugin.DebugHook.Enabled = debugMode;
-
         for (var i = 0; i < 56; i++)
         {
             var action = LogosActions[i];
