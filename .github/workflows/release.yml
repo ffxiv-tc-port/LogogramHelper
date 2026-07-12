@@ -1,10 +1,9 @@
-name: Compile
+name: Release
 
 on:
   push:
-    tags-ignore:
+    tags:
       - 'v*'
-  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -26,3 +25,12 @@ jobs:
           Expand-Archive -Force dalamud-pinned.zip $dest
       - name: Build with dotnet
         run: dotnet build --configuration Release
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+            LogogramHelper/bin/**/LogogramHelper/latest.zip
+            LogogramHelper/bin/**/LogogramHelper/LogogramHelper.json
+          generate_release_notes: true
