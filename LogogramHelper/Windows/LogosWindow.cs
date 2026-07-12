@@ -56,11 +56,23 @@ namespace LogogramHelper.Windows
         private void FillSynthesizer(List<Recipe> recipe, bool starChart)
         {
             if (!SynthesisAutomation.SelectSynthesizer(starChart)) return;
-            recipe.ForEach(item => {
-                if (!Plugin.LogogramRowIndex.TryGetValue(item.LogogramID, out var row)) return;
+            foreach (var item in recipe)
+            {
+                if (!Plugin.LogogramRowIndex.TryGetValue(item.LogogramID, out var row)) continue;
                 for (var q = 0; q < item.Quantity; q++)
+                {
+                    // An unexpected confirmation/quantity dialog (e.g. NumberInputDialog) can pop up
+                    // mid-sequence; continuing to blast further synthetic FireCallback events while it's
+                    // open ends up hitting its buttons instead of the shard list, closing it out from
+                    // under the player. Bail out and let the player finish manually if that happens.
+                    if (Plugin.GameGui.GetAddonByName("NumberInputDialog", 1) != IntPtr.Zero)
+                    {
+                        Plugin.Log.Warning("FillSynthesizer: unexpected NumberInputDialog detected, aborting automation.");
+                        return;
+                    }
                     SynthesisAutomation.AddShard(row);
-            });
+                }
+            }
         }
         public override void Draw()
         {
