@@ -44,9 +44,15 @@ namespace LogogramHelper
         internal IDictionary<int, int> LogogramRowIndex;
         internal IDictionary<ulong, LogogramItem> LogogramItems;
         internal IDictionary<int, int> LogogramStock = new Dictionary<int, int>();
+        internal Configuration Configuration = null!;
+        internal HashSet<string> FillHistory => Configuration.FillHistory;
+        internal List<Preset> Presets => Configuration.Presets;
+        internal (string ActionName, int RecipeIdx)? CurrentLunarSelection { get; private set; }
+        internal (string ActionName, int RecipeIdx)? CurrentStarSelection { get; private set; }
 
         public Plugin()
         {
+            Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
             LoadData();
 
@@ -114,6 +120,75 @@ namespace LogogramHelper
         {
             LogosWindow.SetDetails(action);
             LogosWindow.IsOpen = true;
+        }
+
+        internal static string HistoryKey(string actionName, int recipeIdx, bool starChart) => $"{actionName}#{recipeIdx}#{(starChart ? "star" : "lunar")}";
+
+        internal bool HasFillHistory(string actionName) => FillHistory.Any(key => key.StartsWith($"{actionName}#"));
+
+        internal void FillSynthesizer(LogosAction action, int recipeIdx, bool starChart)
+        {
+            var recipe = action.Recipes[recipeIdx];
+            if (!SynthesisAutomation.SelectSynthesizer(starChart)) return;
+            foreach (var item in recipe)
+            {
+                if (!LogogramRowIndex.TryGetValue(item.LogogramID, out var row)) continue;
+                for (var q = 0; q < item.Quantity; q++)
+                {
+                    // An unexpected confirmation/quantity dialog (e.g. NumberInputDialog) can pop up
+                    // mid-sequence; continuing to blast further synthetic FireCallback events while it's
+                    // open ends up hitting its buttons instead of the shard list, closing it out from
+                    // under the player. Bail out and let the player finish manually if that happens.
+                    if (GameGui.GetAddonByName("NumberInputDialog", 1) != IntPtr.Zero)
+                    {
+                        Log.Warning("FillSynthesizer: unexpected NumberInputDialog detected, aborting automation.");
+                        return;
+                    }
+                    SynthesisAutomation.AddShard(row);
+                }
+            }
+            FillHistory.Add(HistoryKey(action.Name, recipeIdx, starChart));
+            if (starChart)
+                CurrentStarSelection = (action.Name, recipeIdx);
+            else
+                CurrentLunarSelection = (action.Name, recipeIdx);
+            Configuration.Save();
+        }
+
+        internal bool SavePreset(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name) || (CurrentLunarSelection == null && CurrentStarSelection == null)) return false;
+            Presets.RemoveAll(p => p.Name == name);
+            Presets.Add(new Preset
+            {
+                Name = name,
+                LunarActionName = CurrentLunarSelection?.ActionName ?? "",
+                LunarRecipeIdx = CurrentLunarSelection?.RecipeIdx ?? 0,
+                StarActionName = CurrentStarSelection?.ActionName ?? "",
+                StarRecipeIdx = CurrentStarSelection?.RecipeIdx ?? 0,
+            });
+            Configuration.Save();
+            return true;
+        }
+
+        internal void ClearCurrentSelection()
+        {
+            CurrentLunarSelection = null;
+            CurrentStarSelection = null;
+        }
+
+        internal void ApplyPreset(Preset preset)
+        {
+            var lunarAction = LogosActions.FirstOrDefault(a => a.Name == preset.LunarActionName);
+            var starAction = LogosActions.FirstOrDefault(a => a.Name == preset.StarActionName);
+            if (lunarAction != null) FillSynthesizer(lunarAction, preset.LunarRecipeIdx, false);
+            if (starAction != null) FillSynthesizer(starAction, preset.StarRecipeIdx, true);
+        }
+
+        internal void DeletePreset(Preset preset)
+        {
+            Presets.Remove(preset);
+            Configuration.Save();
         }
 
         private unsafe void ItemDetailOnUpdate(AddonEvent type, AddonArgs args)

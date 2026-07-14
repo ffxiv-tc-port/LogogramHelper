@@ -53,27 +53,8 @@ namespace LogogramHelper.Windows
             this.Texture = Plugin.TextureProvider.GetFromGameIcon(action.IconID);
         }
 
-        private void FillSynthesizer(List<Recipe> recipe, bool starChart)
-        {
-            if (!SynthesisAutomation.SelectSynthesizer(starChart)) return;
-            foreach (var item in recipe)
-            {
-                if (!Plugin.LogogramRowIndex.TryGetValue(item.LogogramID, out var row)) continue;
-                for (var q = 0; q < item.Quantity; q++)
-                {
-                    // An unexpected confirmation/quantity dialog (e.g. NumberInputDialog) can pop up
-                    // mid-sequence; continuing to blast further synthetic FireCallback events while it's
-                    // open ends up hitting its buttons instead of the shard list, closing it out from
-                    // under the player. Bail out and let the player finish manually if that happens.
-                    if (Plugin.GameGui.GetAddonByName("NumberInputDialog", 1) != IntPtr.Zero)
-                    {
-                        Plugin.Log.Warning("FillSynthesizer: unexpected NumberInputDialog detected, aborting automation.");
-                        return;
-                    }
-                    SynthesisAutomation.AddShard(row);
-                }
-            }
-        }
+        private string HistoryKey(int recipeIdx, bool starChart) => Plugin.HistoryKey(Action.Name, recipeIdx, starChart);
+
         public override void Draw()
         {
             var addonShardListPtr = Plugin.GameGui.GetAddonByName("EurekaMagiciteItemShardList", 1);
@@ -122,11 +103,21 @@ namespace LogogramHelper.Windows
             for (var recipeIdx = 0; recipeIdx < Action.Recipes.Count; recipeIdx++)
             {
                 var recipe = Action.Recipes[recipeIdx];
-                if (ImGui.SmallButton($"放入靈極##{recipeIdx}"))
-                    FillSynthesizer(recipe, false);
+                var lunarDone = Plugin.FillHistory.Contains(HistoryKey(recipeIdx, false));
+                var starDone = Plugin.FillHistory.Contains(HistoryKey(recipeIdx, true));
+                if (lunarDone)
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
+                if (ImGui.SmallButton($"靈##{recipeIdx}"))
+                    Plugin.FillSynthesizer(Action, recipeIdx, false);
+                if (lunarDone)
+                    ImGui.PopStyleColor();
                 ImGui.SameLine();
-                if (ImGui.SmallButton($"放入星極##{recipeIdx}"))
-                    FillSynthesizer(recipe, true);
+                if (starDone)
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
+                if (ImGui.SmallButton($"星##{recipeIdx}"))
+                    Plugin.FillSynthesizer(Action, recipeIdx, true);
+                if (starDone)
+                    ImGui.PopStyleColor();
                 ImGui.NextColumn();
                 var craftable = new List<int>();
                 recipe.ForEach(item => {
