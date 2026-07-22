@@ -81,11 +81,11 @@ namespace LogogramHelper.Windows
             ImGui.EndGroup();
             var details = Loc.T(Action.Type);
             if (Action.Duration != null)
-                details += $" · 持續時間：{Action.Duration}";
+                details += $" · {Loc.T("DURATION: ")}{Action.Duration}";
             if (Action.Cast != null)
-                details += $" · 詠唱時間：{Action.Cast}";
+                details += $" · {Loc.T("CAST: ")}{Action.Cast}";
             if (Action.Recast != null)
-                details += $" · 重使用時間：{Action.Recast}";
+                details += $" · {Loc.T("RECAST: ")}{Action.Recast}";
             ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), details);
             ImGui.EndGroup();
             ImGui.EndGroup();
@@ -107,14 +107,14 @@ namespace LogogramHelper.Windows
                 var starDone = Plugin.FillHistory.Contains(HistoryKey(recipeIdx, true));
                 if (lunarDone)
                     ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
-                if (ImGui.SmallButton($"靈##{recipeIdx}"))
+                if (ImGui.SmallButton($"{Loc.T("Umbral")}##{recipeIdx}"))
                     Plugin.FillSynthesizer(Action, recipeIdx, false);
                 if (lunarDone)
                     ImGui.PopStyleColor();
                 ImGui.SameLine();
                 if (starDone)
                     ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
-                if (ImGui.SmallButton($"星##{recipeIdx}"))
+                if (ImGui.SmallButton($"{Loc.T("Astral")}##{recipeIdx}"))
                     Plugin.FillSynthesizer(Action, recipeIdx, true);
                 if (starDone)
                     ImGui.PopStyleColor();
@@ -139,7 +139,7 @@ namespace LogogramHelper.Windows
                         ImGui.SameLine();
                     }
                     var owned = LogogramStock[item.LogogramID];
-                    ImGui.Text($"{Loc.T(Logograms[item.LogogramID].Name)} x{item.Quantity}（庫存 {owned}）");
+                    ImGui.Text($"{Loc.T(Logograms[item.LogogramID].Name)} x{item.Quantity} ({Loc.T("Stock")} {owned})");
                     if (idx != recipe.Count - 1)
                     {
                         ImGui.SameLine();

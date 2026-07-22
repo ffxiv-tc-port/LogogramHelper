@@ -119,5 +119,11 @@
   "Logos Details": "文理技能詳情",
   "Filter Logos Actions...": "篩選文理技能...",
   "Support me on Ko-Fi": "在 Ko-Fi 上支持我",
-  "Combinations:": "合成配方："
+  "Combinations:": "合成配方：",
+  "DURATION: ": "持續時間：",
+  "CAST: ": "詠唱時間：",
+  "RECAST: ": "重使用時間：",
+  "Umbral": "靈",
+  "Astral": "星",
+  "Stock": "庫存"
 }
