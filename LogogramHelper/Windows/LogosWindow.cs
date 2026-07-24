@@ -2,8 +2,7 @@ using Dalamud.Interface.Internal;
 using Dalamud.Interface.Textures;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
-using ImGuiNET;
-using ImGuiScene;
+using Dalamud.Bindings.ImGui;
 using LogogramHelper.Classes;
 using System;
 using System.Collections.Generic;
@@ -67,7 +66,7 @@ namespace LogogramHelper.Windows
             var fontScaling = ImGui.GetFontSize() / 17;
             ImGui.PushTextWrapPos(540.0f * fontScaling);
             ImGui.BeginGroup();
-            ImGui.Image(Texture.GetWrapOrEmpty().ImGuiHandle, new Vector2(40, 40) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
+            ImGui.Image(Texture.GetWrapOrEmpty().Handle, new Vector2(40, 40) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
             ImGui.SameLine();
             ImGui.BeginGroup();
             ImGui.Text(Loc.T(Action.Name));
@@ -75,7 +74,7 @@ namespace LogogramHelper.Windows
             ImGui.BeginGroup();
             Action.Roles.ForEach(role => {
                 var roleTexture = Plugin.TextureProvider.GetFromGameIcon(role).GetWrapOrEmpty();
-                ImGui.Image(roleTexture.ImGuiHandle, new Vector2(18, 18) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
+                ImGui.Image(roleTexture.Handle, new Vector2(18, 18) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
                 ImGui.SameLine();
             });
             ImGui.EndGroup();
@@ -135,7 +134,7 @@ namespace LogogramHelper.Windows
                     var item = recipe[idx];
                     if (Plugin.LogogramIcons.TryGetValue(item.LogogramID, out var logogramIcon))
                     {
-                        ImGui.Image(Plugin.TextureProvider.GetFromGameIcon(logogramIcon).GetWrapOrEmpty().ImGuiHandle, new Vector2(iconSize, iconSize), new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
+                        ImGui.Image(Plugin.TextureProvider.GetFromGameIcon(logogramIcon).GetWrapOrEmpty().Handle, new Vector2(iconSize, iconSize), new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
                         ImGui.SameLine();
                     }
                     var owned = LogogramStock[item.LogogramID];
