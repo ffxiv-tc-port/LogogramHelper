@@ -13,7 +13,7 @@
     <FileVersion>$(Version)</FileVersion>
     <Description>Helper plugin for Eureka's Logos Actions</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/Lother/LogogramHelper</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ffxiv-tc-port/LogogramHelper</PackageProjectUrl>
   </PropertyGroup>
 
   <Target Name="PersistBuildNumber" AfterTargets="Build">

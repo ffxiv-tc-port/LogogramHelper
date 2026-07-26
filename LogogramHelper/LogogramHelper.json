@@ -3,7 +3,7 @@
     "Author": "apetih",
     "Punchline": "優雷卡聖言技能輔助工具。",
     "Description": "進入聖言操縱者後，顯示優雷卡聖言技能所有可能組合的數量。",
-    "RepoUrl": "https://github.com/Lother/LogogramHelper",
+    "RepoUrl": "https://github.com/ffxiv-tc-port/LogogramHelper",
     "ApplicableVersion": "any",
     "Tags": [
         "eureka",
@@ -12,5 +12,5 @@
     "CategoryTags": [
         "utility"
     ],
-    "IconUrl": "https://raw.githubusercontent.com/Lother/DalamudPluginsTC/main/icons/LogogramHelper.png"
+    "IconUrl": "https://raw.githubusercontent.com/ffxiv-tc-port/DalamudPluginsTC/main/icons/LogogramHelper.png"
 }
