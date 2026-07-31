@@ -126,6 +126,7 @@
   "Umbral": "靈極",
   "Astral": "星極",
   "Stock": "庫存",
+  "Could not read logogram stock; the counts below are not accurate.": "無法讀取文理碎晶庫存，以下數量並不準確。",
   "Preset name...": "預設組合名稱…",
   "Save current combination": "儲存目前組合",
   "Fill in at least one synthesizer first": "請先在任一融合器中放入文理碎晶",
