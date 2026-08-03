@@ -198,9 +198,17 @@ namespace LogogramHelper
             {
                 var contentsId = LogogramItems[id].Contents;
                 var contents = new List<string>();
+                // The ContainsKey above guards LogogramItems (itemContents.json); the lookup
+                // below is against Logograms (logograms.json) keyed by an id that came out of
+                // the *value* of the first dictionary. Different files, different key spaces -
+                // equal only by convention (verified equal today: 28 ids on both sides). This
+                // runs on every item tooltip from an addon hook, so degrade to the raw id
+                // rather than throwing once per frame while an item is hovered.
                 contentsId.ForEach(content =>
                 {
-                    contents.Add(Loc.T(Logograms[content].Name));
+                    contents.Add(Logograms.TryGetValue(content, out var logogram)
+                        ? Loc.T(logogram.Name)
+                        : $"#{content}");
                 });
 
                 var arrayData = Framework.Instance()->GetUIModule()->GetRaptureAtkModule()->AtkModule.AtkArrayDataHolder;

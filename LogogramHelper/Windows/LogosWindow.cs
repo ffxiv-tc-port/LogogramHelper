@@ -232,7 +232,19 @@ namespace LogogramHelper.Windows
                         ImGui.SameLine();
                     }
                     var owned = LogogramStock[item.LogogramID];
-                    ImGui.Text($"{Loc.T(Logograms[item.LogogramID].Name)} x{item.Quantity} ({Loc.T("Stock")} {owned})");
+                    // Recipes come from logosActions.json but the names come from
+                    // logograms.json - two separate data files whose key sets are only equal by
+                    // convention (verified equal today: 28 ids on both sides). The
+                    // LogogramIcons lookup above is built from Logograms and therefore shares
+                    // its keys exactly, so a miss there means this lookup would throw - and
+                    // throwing out of Draw() replaces the entire window with Dalamud's error
+                    // placeholder, which is exactly the failure this window already had once.
+                    // Degrade to the raw id instead of hiding the ingredient, so a desynced
+                    // data file shows up as an odd label rather than a silently short recipe.
+                    var itemName = Logograms.TryGetValue(item.LogogramID, out var logogram)
+                        ? Loc.T(logogram.Name)
+                        : $"#{item.LogogramID}";
+                    ImGui.Text($"{itemName} x{item.Quantity} ({Loc.T("Stock")} {owned})");
                     if (idx != recipe.Count - 1)
                     {
                         ImGui.SameLine();
