@@ -226,7 +226,31 @@ namespace LogogramHelper
                 var raptureAtkModule = uiModule->GetRaptureAtkModule();
                 if (raptureAtkModule == null) return;
 
+                // 🔴 上面三層判空守住的是「單例還沒建立」，這裡是**另一類**:
+                //    AtkArrayDataHolder.StringArrays 在 FFXIVClientStructs 裡是
+                //    StringArrayData**（裸指標陣列，沒有邊界檢查），而 CS 對這組欄位的
+                //    註解明寫「these are total counts - some of the slots can be (and are) empty」
+                //    —— 也就是**陣列本身可能還沒配置、索引可能越界、取回的元素可以是 null**。
+                //    原本 arrayData.StringArrays[27] 直接餵進 GetTooltipString 再
+                //    stringArrayData->StringArray[field]，三種情況都是裸解參考／越界讀。
+                //    這支跑在道具 tooltip 的 addon hook 上（每次滑過道具都經過），
+                //    AVE 是 corrupted-state exception，try/catch 攔不到。
                 var arrayData = raptureAtkModule->AtkModule.AtkArrayDataHolder;
+                if (arrayData.StringArrays == null || arrayData.StringArrayCount <= 27)
+                {
+                    // 走到這裡代表 tooltip 附註會靜默消失，所以留一筆（只留一次，
+                    // 這支每次滑過道具都會跑，不能每幀寫 log）。使用者跑 LogLevel 2，
+                    // 診斷一律 Information 才收得到。
+                    if (!_stringArrayUnavailableLogged)
+                    {
+                        _stringArrayUnavailableLogged = true;
+                        Log.Information(
+                            $"[LogogramHelper] 取不到道具詳情字串陣列（StringArrays={(nint)arrayData.StringArrays:X}, StringArrayCount={arrayData.StringArrayCount}），本次起略過 tooltip 附註。");
+                    }
+
+                    return;
+                }
+
                 var stringArrayData = arrayData.StringArrays[27];
                 var seStr = GetTooltipString(stringArrayData, 13);
                 if (seStr == null) return;
@@ -238,8 +262,19 @@ namespace LogogramHelper
             }
         }
 
+        private static bool _stringArrayUnavailableLogged;
+
         private static unsafe SeString? GetTooltipString(StringArrayData* stringArrayData, int field)
         {
+            // ⚠️ 這個參數的來源是 AtkArrayDataHolder.StringArrays[n]，是**陣列元素**，
+            //    與「單例取不到」不同類:槽位可以合法是 null（CS 註解:some of the slots
+            //    can be (and are) empty）。呼叫端已經先擋過一次，這裡再擋一次是因為本函式
+            //    是 static helper，日後多一個呼叫點就會多一條裸解參考的路徑。
+            //    回 null 而不是空字串 —— 呼叫端的既有語意就是 seStr == null 時放棄本次
+            //    附註、tooltip 維持原樣；回空字串會讓呼叫端繼續往下把 field 13 覆寫成
+            //    只剩附註文字，等於把 tooltip 內容洗掉。
+            if (stringArrayData == null) return null;
+
             var stringAddress = new IntPtr(stringArrayData->StringArray[field]);
             return stringAddress != IntPtr.Zero ? MemoryHelper.ReadSeStringNullTerminated(stringAddress) : null;
         }
