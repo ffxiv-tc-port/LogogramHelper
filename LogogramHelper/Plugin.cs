@@ -211,7 +211,22 @@ namespace LogogramHelper
                         : $"#{content}");
                 });
 
-                var arrayData = Framework.Instance()->GetUIModule()->GetRaptureAtkModule()->AtkModule.AtkArrayDataHolder;
+                // 🔴 原本是三層裸鏈。Framework.Instance() 是 [StaticAddress(..., isPointer: true)]：
+                //    產生器讀「指標的位址」再解參考一層，遊戲尚未建立單例時回 null（非 isPointer
+                //    的那種才保證不回 null，是擲 InvalidOperationException）。
+                //    GetUIModule() / GetRaptureAtkModule() 同樣可能回 null
+                //    （RaptureAtkModule.Instance() 在 CS 裡就是 `uiModule == null ? null : ...` 的手寫包裝）。
+                //    裸解參考 null 原生指標是 AVE，屬 corrupted-state exception，try/catch 攔不到。
+                //    這支跑在道具 tooltip 的 addon hook 上（每次滑過道具都經過），取不到就放棄本次
+                //    附註，走既有的 seStr == null 相同語意：tooltip 維持原樣，不崩潰。
+                var framework = Framework.Instance();
+                if (framework == null) return;
+                var uiModule = framework->GetUIModule();
+                if (uiModule == null) return;
+                var raptureAtkModule = uiModule->GetRaptureAtkModule();
+                if (raptureAtkModule == null) return;
+
+                var arrayData = raptureAtkModule->AtkModule.AtkArrayDataHolder;
                 var stringArrayData = arrayData.StringArrays[27];
                 var seStr = GetTooltipString(stringArrayData, 13);
                 if (seStr == null) return;
