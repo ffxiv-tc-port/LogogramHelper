@@ -3,11 +3,22 @@
   <PropertyGroup>
     <Authors>apetih</Authors>
     <Company></Company>
-    <Version>0.0.3.4</Version>
+    <BuildNumberFile>$(MSBuildProjectDirectory)\BuildNumber.txt</BuildNumberFile>
+    <_PreviousBuildNumber Condition="Exists('$(BuildNumberFile)')">$([System.IO.File]::ReadAllText('$(BuildNumberFile)').Trim())</_PreviousBuildNumber>
+    <_PreviousBuildNumber Condition="'$(_PreviousBuildNumber)' == ''">0</_PreviousBuildNumber>
+    <BuildNumber>$([MSBuild]::Add($(_PreviousBuildNumber), 1))</BuildNumber>
+    <VersionPrefix>7.15.0</VersionPrefix>
+    <Version>$(VersionPrefix).$(BuildNumber)</Version>
+    <AssemblyVersion>$(Version)</AssemblyVersion>
+    <FileVersion>$(Version)</FileVersion>
     <Description>Helper plugin for Eureka's Logos Actions</Description>
     <Copyright></Copyright>
-    <PackageProjectUrl>https://github.com/apetih/LogogramHelper</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ffxiv-tc-port/LogogramHelper</PackageProjectUrl>
   </PropertyGroup>
+
+  <Target Name="PersistBuildNumber" AfterTargets="Build">
+    <WriteLinesToFile File="$(BuildNumberFile)" Lines="$(BuildNumber)" Overwrite="true" />
+  </Target>
 
   <ItemGroup>
       <Content Include="..\res\data\logograms.json">
@@ -22,6 +33,7 @@
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <Visible>false</Visible>
       </Content>
+      <EmbeddedResource Include="loc\*.json" />
   </ItemGroup>
 
 

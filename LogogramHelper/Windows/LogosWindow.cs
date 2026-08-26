@@ -21,7 +21,7 @@ namespace LogogramHelper.Windows
         private ISharedImmediateTexture Texture { get; set; } = null!;
         private IDictionary<uint, ISharedImmediateTexture> RoleTextures { get; set; } = null!;
         public LogosWindow(Plugin plugin) : base(
-        "Logos Details", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize)
+        Loc.T("Logos Details"), ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.AlwaysAutoResize)
         {
             this.Plugin = plugin;
             this.Action = plugin.LogosActions[0];
@@ -52,6 +52,9 @@ namespace LogogramHelper.Windows
             this.Action = action;
             this.Texture = Plugin.TextureProvider.GetFromGameIcon(action.IconID);
         }
+
+        private string HistoryKey(int recipeIdx, bool starChart) => Plugin.HistoryKey(Action.Name, recipeIdx, starChart);
+
         public override void Draw()
         {
             var addonShardListPtr = Plugin.GameGui.GetAddonByName("EurekaMagiciteItemShardList", 1);
@@ -67,7 +70,7 @@ namespace LogogramHelper.Windows
             ImGui.Image(Texture.GetWrapOrEmpty().ImGuiHandle, new Vector2(40, 40) * fontScaling, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
             ImGui.SameLine();
             ImGui.BeginGroup();
-            ImGui.Text(Action.Name);
+            ImGui.Text(Loc.T(Action.Name));
             ImGui.SameLine();
             ImGui.BeginGroup();
             Action.Roles.ForEach(role => {
@@ -76,41 +79,76 @@ namespace LogogramHelper.Windows
                 ImGui.SameLine();
             });
             ImGui.EndGroup();
-            var details = Action.Type.ToUpper();
+            var details = Loc.T(Action.Type);
             if (Action.Duration != null)
-                details += $" · DURATION: {Action.Duration}";
+                details += $" · {Loc.T("DURATION: ")}{Action.Duration}";
             if (Action.Cast != null)
-                details += $" · CAST: {Action.Cast}";
+                details += $" · {Loc.T("CAST: ")}{Action.Cast}";
             if (Action.Recast != null)
-                details += $" · RECAST: {Action.Recast}";
+                details += $" · {Loc.T("RECAST: ")}{Action.Recast}";
             ImGui.TextColored(new Vector4(1.0f, 0.8f, 0.0f, 1.0f), details);
             ImGui.EndGroup();
             ImGui.EndGroup();
             ImGui.Spacing();
-            ImGui.Text($"{Action.Description}");
+            ImGui.Text(Loc.T(Action.Description));
             ImGui.Spacing();
-            ImGui.Text("Combinations:");
-            ImGui.BeginChild($"combinations{Action.Name}", new Vector2(540.0f * fontScaling, (ImGui.GetFontSize() + 4) * Action.Recipes.Count), false, ImGuiWindowFlags.NoScrollbar);
-            ImGui.Columns(2, "combinations", false);
-            ImGui.SetColumnWidth(0, 40f);
-            ImGui.SetColumnWidth(1, 500f * fontScaling);
-            Action.Recipes.ForEach(recipe => {
-                var total = new List<int>();
-                var logosNames = new List<string>();
+            ImGui.Text(Loc.T("Combinations:"));
+            var iconSize = ImGui.GetFontSize() * 1.4f;
+            var rowHeight = iconSize + 6;
+            ImGui.BeginChild($"combinations{Action.Name}", new Vector2(540.0f * fontScaling, rowHeight * Action.Recipes.Count), false, ImGuiWindowFlags.NoScrollbar);
+            ImGui.Columns(3, "combinations", false);
+            ImGui.SetColumnWidth(0, 90f * fontScaling);
+            ImGui.SetColumnWidth(1, 40f);
+            ImGui.SetColumnWidth(2, 410f * fontScaling);
+            for (var recipeIdx = 0; recipeIdx < Action.Recipes.Count; recipeIdx++)
+            {
+                var recipe = Action.Recipes[recipeIdx];
+                var lunarDone = Plugin.FillHistory.Contains(HistoryKey(recipeIdx, false));
+                var starDone = Plugin.FillHistory.Contains(HistoryKey(recipeIdx, true));
+                if (lunarDone)
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
+                if (ImGui.SmallButton($"{Loc.T("Umbral")}##{recipeIdx}"))
+                    Plugin.FillSynthesizer(Action, recipeIdx, false);
+                if (lunarDone)
+                    ImGui.PopStyleColor();
+                ImGui.SameLine();
+                if (starDone)
+                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.4f, 1.0f, 0.4f, 1.0f));
+                if (ImGui.SmallButton($"{Loc.T("Astral")}##{recipeIdx}"))
+                    Plugin.FillSynthesizer(Action, recipeIdx, true);
+                if (starDone)
+                    ImGui.PopStyleColor();
+                ImGui.NextColumn();
+                var craftable = new List<int>();
                 recipe.ForEach(item => {
                     if (!LogogramStock.ContainsKey(item.LogogramID))
                         LogogramStock.Add(item.LogogramID, 0);
-                    total.Add(LogogramStock[item.LogogramID] / item.Quantity);
-                    for (var j = 0; j < item.Quantity; j++) logosNames.Add(Logograms[item.LogogramID].Name);
+                    craftable.Add(LogogramStock[item.LogogramID] / item.Quantity);
                 });
-                if (total.Min() > 0)
-                    ImGui.Text($"{total.Min()}");
+                if (craftable.Min() > 0)
+                    ImGui.Text($"{craftable.Min()}");
                 else
-                    ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), $"{total.Min()}");
+                    ImGui.TextColored(new Vector4(1.0f, 0.0f, 0.0f, 1.0f), $"{craftable.Min()}");
                 ImGui.NextColumn();
-                ImGui.Text(string.Join(" + ", logosNames));
+                for (var idx = 0; idx < recipe.Count; idx++)
+                {
+                    var item = recipe[idx];
+                    if (Plugin.LogogramIcons.TryGetValue(item.LogogramID, out var logogramIcon))
+                    {
+                        ImGui.Image(Plugin.TextureProvider.GetFromGameIcon(logogramIcon).GetWrapOrEmpty().ImGuiHandle, new Vector2(iconSize, iconSize), new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
+                        ImGui.SameLine();
+                    }
+                    var owned = LogogramStock[item.LogogramID];
+                    ImGui.Text($"{Loc.T(Logograms[item.LogogramID].Name)} x{item.Quantity} ({Loc.T("Stock")} {owned})");
+                    if (idx != recipe.Count - 1)
+                    {
+                        ImGui.SameLine();
+                        ImGui.Text("+");
+                        ImGui.SameLine();
+                    }
+                }
                 ImGui.NextColumn();
-            });
+            }
             ImGui.EndChild();
             ImGui.PopTextWrapPos();
         }
