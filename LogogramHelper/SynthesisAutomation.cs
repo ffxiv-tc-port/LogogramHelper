@@ -8,7 +8,7 @@ namespace LogogramHelper
         // (29, 0) focuses the 星極融合器 (right slot).
         public static bool SelectSynthesizer(bool starChart)
         {
-            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("EurekaMagiciteItemSynthesis", 1);
+            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("EurekaMagiciteItemSynthesis", 1).Address;
             if (addon == null) return false;
             FireTwoInts(addon, 29, starChart ? 0 : 1);
             return true;
@@ -18,7 +18,7 @@ namespace LogogramHelper
         // currently displayed (全部 tab) shard list to whichever synthesizer has focus.
         public static bool AddShard(int rowIndex)
         {
-            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("EurekaMagiciteItemShardList", 1);
+            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("EurekaMagiciteItemShardList", 1).Address;
             if (addon == null) return false;
             FireTwoInts(addon, 14, rowIndex);
             return true;
