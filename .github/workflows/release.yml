@@ -19,7 +19,7 @@ jobs:
         run: |
           $dest = "$env:APPDATA\XIVLauncher\addon\Hooks\dev"
           New-Item -ItemType Directory -Force -Path $dest | Out-Null
-          Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v12.0.2/dalamud-api12-net9.zip -OutFile dalamud-pinned.zip
+          Invoke-WebRequest -Uri https://github.com/ffxiv-tc-port/DalamudPluginsTC/releases/download/dalamud-pin-v13.0.0.16/dalamud-api13-net9.zip -OutFile dalamud-pinned.zip
           Expand-Archive -Force dalamud-pinned.zip $dest
       - name: Compute version
         shell: pwsh
@@ -42,3 +42,5 @@ jobs:
             LogogramHelper.zip
             LogogramHelper/bin/**/LogogramHelper/LogogramHelper.json
           generate_release_notes: true
+
+# 2026-08-16: repo 重建後 workflow_dispatch-only workflow 未被 Actions 重新註冊,touch 本檔強制重掃
