@@ -239,7 +239,7 @@ namespace LogogramHelper
                 if (arrayData.StringArrays == null || arrayData.StringArrayCount <= 27)
                 {
                     // 走到這裡代表 tooltip 附註會靜默消失，所以留一筆（只留一次，
-                    // 這支每次滑過道具都會跑，不能每幀寫 log）。使用者跑 LogLevel 2，
+                    // 這支每次滑過道具都會跑，不能每幀寫 log）。使用者跑 LogLevel 1，
                     // 診斷一律 Information 才收得到。
                     if (!_stringArrayUnavailableLogged)
                     {
