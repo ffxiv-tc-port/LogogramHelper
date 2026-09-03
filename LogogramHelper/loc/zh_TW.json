@@ -92,7 +92,7 @@
   "Smite L": "文理猛擊",
   "Delivers an attack with a potency of 1,000.\nCan only be executed when your HP is below 50%%.\nAdditional Effect: Restores an amount of own HP proportional to damage dealt": "攻擊（威力1000，HP低於50%時可使用），回復HP",
   "Refresh L": "文理醒神",
-  "Increases the amount of magia aether regenerated over time by self and nearby party members.": "提高以太恢復速度（30秒）",
+  "Increases the amount of magia aether regenerated over time by self and nearby party members.": "提高乙太恢復速度（30秒）",
   "Banish L": "文理放逐",
   "Deals unaspected damage with a potency of 200.\nAdditional Effect: Afflicts undead targets with Banish L, increasing damage taken by 25%%": "無屬性攻擊（威力200），不死族受到的傷害增加25%（60秒）",
   "Banish L III": "文理強放逐",
