@@ -1,21 +1,13 @@
 # Logogram Helper
 
-Very rough dalamud plugin for Eureka's Logos Actions.
+[LogogramHelper](https://github.com/apetih/LogogramHelper) 的台服移植版，優雷卡文理技能輔助工具。
 
-Shows combinations for Logos Actions and the amounts you're able to synthesize using your available logograms.
+## 功能
 
-Based on [this tracker](https://ffxiv-eureka.com/logograms).
+- 進入文理融合器時自動彈出視窗，列出所有文理技能
+- 點選技能查看合成配方，並依目前持有的文理碎晶庫存計算可合成數量
+- 可篩選文理技能清單
+- 一鍵將選定的配方碎晶自動填入融合器（星極/靈極）對應欄位
+- 可儲存常用的碎晶組合
 
-## How to Use
-A window with all the Logos Actions should automatically pop up whenever you enter the Logos Manipulator.
-
-Click on one of the actions to show detailed information and the combinations.
-
-## Installation
-
-To install the plugin from the official Dalamud repo, enable `Get plugin testing builds` under the `Experimental` tab in Dalamud Settings.
-
-Once added, look for Logogram Helper in the Plugin Installer.
-
-## Special Thanks
-* Wrex - For the plugin icon
+插件圖示由 Wrex 提供。
