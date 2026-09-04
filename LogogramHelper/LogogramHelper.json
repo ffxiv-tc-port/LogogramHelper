@@ -1,8 +1,8 @@
 {
     "Name": "Logogram Helper",
     "Author": "apetih",
-    "Punchline": "優雷卡聖言技能輔助工具。",
-    "Description": "進入聖言操縱者後，顯示優雷卡聖言技能所有可能組合的數量。",
+    "Punchline": "優雷卡文理技能輔助工具。",
+    "Description": "進入文理融合器後，顯示優雷卡文理技能所有可能組合的數量。",
     "RepoUrl": "https://github.com/ffxiv-tc-port/LogogramHelper",
     "ApplicableVersion": "any",
     "Tags": [
