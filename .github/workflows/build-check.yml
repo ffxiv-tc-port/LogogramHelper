@@ -29,3 +29,4 @@ jobs:
           Expand-Archive -Force dalamud-pinned.zip $dest
       - name: Build with dotnet
         run: dotnet build --configuration Release -p:DalamudLibPath="$env:RUNNER_TEMP\dalamud-pinned\"
+# workflow re-registration trigger 2026-10-26T18:15:19Z
